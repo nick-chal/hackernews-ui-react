@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
 import {
-  BrowserRouter as Router,
   Route,
+  Switch,
   Redirect,
-  Switch
+  BrowserRouter as Router
 } from 'react-router-dom';
 
-import '../assets/style';
+import '../assets/css/style';
+
+import Story from './Story';
 import Navbar from './Navbar';
-import Stories from './Stories';
+import StoryList from './StoryList';
 import ROUTES from '../constants/routes';
 
 /**
@@ -24,15 +26,11 @@ class App extends Component {
         <div className="App">
           <Navbar />
           <Switch>
-            <Route
-              exact
-              path="/"
-              render={() => <Redirect to="/topstories" />}
-            />
-            <Route exact path={ROUTES.TOP} component={() => <Stories />} />
-            <Route exact path={ROUTES.NEW} component={() => <Stories />} />
-            <Route exact path={ROUTES.BEST} component={() => <Stories />} />
-            <Route path="/" render={() => <div>404 Invalid URL </div>} />
+            <Route exact path="/" render={() => <Redirect to={ROUTES.TOP} />} />
+            <Route exact path={ROUTES.TOP} component={() => <StoryList />} />
+            <Route exact path={ROUTES.NEW} component={() => <StoryList />} />
+            <Route exact path={ROUTES.BEST} component={() => <StoryList />} />
+            <Route exact path="/:id" component={() => <Story />} />
           </Switch>
         </div>
       </Router>

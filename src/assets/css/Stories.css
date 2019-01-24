@@ -13,17 +13,13 @@
   border-bottom: 1px solid #ccc;
 }
 
-.story:hover {
-  background-color: #ccc;
-}
-
-.story a {
+.stories-list a {
   color: inherit;
   text-decoration: none;
 }
 
-.story a:hover {
-  text-decoration: underline;
+.stories-list p {
+  font-size: 1.25em;
 }
 
 .no-items {
@@ -32,6 +28,23 @@
   color: rgb(200, 200, 200);
 }
 
-.story span {
-  font-size: 0.8em;
+.story-detail {
+  font-size: 14px;
+}
+
+button {
+  padding: 2px;
+  margin: 0 5px;
+  cursor: pointer;
+  background-color: #ccc;
+}
+
+@media only screen and (min-width: 768px) {
+  .story:hover {
+    background-color: #ccc;
+  }
+
+  .stories-list a:hover p {
+    text-decoration: underline;
+  }
 }

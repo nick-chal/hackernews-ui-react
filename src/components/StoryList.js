@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import { withRouter } from 'react-router';
 
 import api from '../services/api';
 import constant from '../constants/data';
+import timeElapsed from '../utils/time';
 
 /**
  * The main page showing all the top stories.
@@ -26,32 +28,39 @@ class Stories extends React.Component {
   }
 
   /**
-   * Change the page number.
-   *
-   * @param {Number} value
+   * Goto previous page.
    */
-  pageHandler = value => {
-    if (
-      (this.state.currentPage === 0 && value === -1) ||
-      (this.state.currentPage === 4 && value === 1)
-    ) {
+  goToPreviousPage = () => {
+    if (this.state.currentPage <= 0) {
       return;
     }
     this.setState(prevState => ({
-      currentPage: prevState.currentPage + value
+      currentPage: prevState.currentPage - 1
     }));
   };
 
   /**
+   * Goto next page.
+   */
+  goToNextPage = () => {
+    if (this.state.currentPage >= constant.TOTALPAGES - 1) {
+      return;
+    }
+    this.setState(prevState => ({
+      currentPage: prevState.currentPage + 1
+    }));
+  };
+  /**
    * Load the storiesId and update StoriesIDList.
    */
   updateStoriesList = () => {
-    if (this.state.storiesIdList && this.state.storiesIdList.length > 1) {
+    if (this.state.storiesIdList && this.state.storiesIdList.length > 0) {
       this.loadStories();
 
       return;
     }
-    api(this.state.storyType)
+    api
+      .getList(this.state.storyType)
       .then(storiesList => {
         this.setState({ storiesIdList: storiesList.data }, this.loadStories);
       })
@@ -67,10 +76,29 @@ class Stories extends React.Component {
       return;
     }
     for (let i = this.start; i < this.end; i++) {
-      api('story', this.state.storiesIdList[i]).then(story => {
+      api.getItem(this.state.storiesIdList[i]).then(story => {
         this.setState({ stories: [...this.state.stories, story.data] });
       });
     }
+  };
+
+  displayStories = () => {
+    const result = this.state.stories.map((value, index) =>
+      value && index >= this.start && index < this.end ? (
+        <Link to={`/${value.id}`} key={value.id}>
+          <li className="story">
+            <p>{`${value.title}`}</p>
+            <span className="story-detail">{`-by ${value.by} | ${
+              value.score
+            } points | ${value.descendants} comments | ${timeElapsed(
+              Math.floor(value.time / 100)
+            )}`}</span>
+          </li>
+        </Link>
+      ) : null
+    );
+
+    return result;
   };
 
   /**
@@ -101,39 +129,20 @@ class Stories extends React.Component {
 
     return (
       <div>
+        <div>
+          <button onClick={this.goToPreviousPage}>{'<'}</button>
+          <span>
+            {this.state.currentPage + 1}
+            <button onClick={this.goToNextPage}>{'>'}</button>
+          </span>
+        </div>
         <ul className="stories-list">
-          {this.state.stories && this.state.stories.length > 0 ? (
-            this.state.stories.map((value, index) =>
-              index >= this.start && index < this.end ? (
-                <li className="story" key={value.id}>
-                  <a href={value.url}>{`${value.title}`}</a> <br />
-                  <span>{`-(${value.by})   score: ${value.score}`}</span>
-                </li>
-              ) : null
-            )
+          {this.state.stories && this.state.stories.length > this.start ? (
+            this.displayStories()
           ) : (
             <div className="no-items"> {'Loading...'}</div>
           )}
         </ul>
-        <div>
-          <button
-            onClick={() => {
-              this.pageHandler(-1);
-            }}
-          >
-            P
-          </button>
-          <span>
-            {this.state.currentPage + 1}
-            <button
-              onClick={() => {
-                this.pageHandler(1);
-              }}
-            >
-              N
-            </button>
-          </span>
-        </div>
       </div>
     );
   }

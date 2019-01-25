@@ -26,19 +26,26 @@ class Stories extends React.Component {
   }
 
   /**
-   * Change the page number.
-   *
-   * @param {Number} value
+   * Goto previous page.
    */
-  pageHandler = value => {
-    if (
-      (this.state.currentPage === 0 && value === -1) ||
-      (this.state.currentPage === 4 && value === 1)
-    ) {
+  gotToPreviousPage = () => {
+    if (this.state.currentPage === 0) {
       return;
     }
     this.setState(prevState => ({
-      currentPage: prevState.currentPage + value
+      currentPage: prevState.currentPage - 1
+    }));
+  };
+
+  /**
+   * Goto next page.
+   */
+  gotToNextPage = () => {
+    if (this.state.currentPage < constant.TOTALPAGES) {
+      return;
+    }
+    this.setState(prevState => ({
+      currentPage: prevState.currentPage + 1
     }));
   };
 
@@ -46,12 +53,13 @@ class Stories extends React.Component {
    * Load the storiesId and update StoriesIDList.
    */
   updateStoriesList = () => {
-    if (this.state.storiesIdList && this.state.storiesIdList.length > 1) {
+    if (this.state.storiesIdList && this.state.storiesIdList.length > 0) {
       this.loadStories();
 
       return;
     }
-    api(this.state.storyType)
+    api
+      .getList(this.state.storyType)
       .then(storiesList => {
         this.setState({ storiesIdList: storiesList.data }, this.loadStories);
       })
@@ -67,7 +75,7 @@ class Stories extends React.Component {
       return;
     }
     for (let i = this.start; i < this.end; i++) {
-      api('story', this.state.storiesIdList[i]).then(story => {
+      api.getItem(this.state.storiesIdList[i]).then(story => {
         this.setState({ stories: [...this.state.stories, story.data] });
       });
     }
@@ -104,7 +112,7 @@ class Stories extends React.Component {
         <ul className="stories-list">
           {this.state.stories && this.state.stories.length > 0 ? (
             this.state.stories.map((value, index) =>
-              index >= this.start && index < this.end ? (
+              value && index >= this.start && index < this.end ? (
                 <li className="story" key={value.id}>
                   <a href={value.url}>{`${value.title}`}</a> <br />
                   <span>{`-(${value.by})   score: ${value.score}`}</span>
@@ -116,22 +124,10 @@ class Stories extends React.Component {
           )}
         </ul>
         <div>
-          <button
-            onClick={() => {
-              this.pageHandler(-1);
-            }}
-          >
-            P
-          </button>
+          <button onClick={this.gotToPreviousPage}>P</button>
           <span>
             {this.state.currentPage + 1}
-            <button
-              onClick={() => {
-                this.pageHandler(1);
-              }}
-            >
-              N
-            </button>
+            <button onClick={this.gotToNextPage}>N</button>
           </span>
         </div>
       </div>

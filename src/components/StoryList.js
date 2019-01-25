@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import { withRouter } from 'react-router';
 
 import api from '../services/api';
 import constant from '../constants/data';
+import timeElapsed from '../utils/time';
 
 /**
  * The main page showing all the top stories.
@@ -28,8 +30,8 @@ class Stories extends React.Component {
   /**
    * Goto previous page.
    */
-  gotToPreviousPage = () => {
-    if (this.state.currentPage === 0) {
+  goToPreviousPage = () => {
+    if (this.state.currentPage <= 0) {
       return;
     }
     this.setState(prevState => ({
@@ -40,15 +42,14 @@ class Stories extends React.Component {
   /**
    * Goto next page.
    */
-  gotToNextPage = () => {
-    if (this.state.currentPage < constant.TOTALPAGES) {
+  goToNextPage = () => {
+    if (this.state.currentPage >= constant.TOTALPAGES - 1) {
       return;
     }
     this.setState(prevState => ({
       currentPage: prevState.currentPage + 1
     }));
   };
-
   /**
    * Load the storiesId and update StoriesIDList.
    */
@@ -81,6 +82,25 @@ class Stories extends React.Component {
     }
   };
 
+  displayStories = () => {
+    const result = this.state.stories.map((value, index) =>
+      value && index >= this.start && index < this.end ? (
+        <Link to={`/${value.id}`} key={value.id}>
+          <li className="story">
+            <p>{`${value.title}`}</p>
+            <span className="story-detail">{`-by ${value.by} | ${
+              value.score
+            } points | ${value.descendants} comments | ${timeElapsed(
+              Math.floor(value.time / 100)
+            )}`}</span>
+          </li>
+        </Link>
+      ) : null
+    );
+
+    return result;
+  };
+
   /**
    * Called after the component is mounted in dom.
    */
@@ -109,27 +129,20 @@ class Stories extends React.Component {
 
     return (
       <div>
+        <div>
+          <button onClick={this.goToPreviousPage}>{'<'}</button>
+          <span>
+            {this.state.currentPage + 1}
+            <button onClick={this.goToNextPage}>{'>'}</button>
+          </span>
+        </div>
         <ul className="stories-list">
-          {this.state.stories && this.state.stories.length > 0 ? (
-            this.state.stories.map((value, index) =>
-              value && index >= this.start && index < this.end ? (
-                <li className="story" key={value.id}>
-                  <a href={value.url}>{`${value.title}`}</a> <br />
-                  <span>{`-(${value.by})   score: ${value.score}`}</span>
-                </li>
-              ) : null
-            )
+          {this.state.stories && this.state.stories.length > this.start ? (
+            this.displayStories()
           ) : (
             <div className="no-items"> {'Loading...'}</div>
           )}
         </ul>
-        <div>
-          <button onClick={this.gotToPreviousPage}>P</button>
-          <span>
-            {this.state.currentPage + 1}
-            <button onClick={this.gotToNextPage}>N</button>
-          </span>
-        </div>
       </div>
     );
   }

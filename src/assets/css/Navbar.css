@@ -7,7 +7,6 @@
   margin: 0 auto;
   padding: 0;
   overflow: hidden;
-  /* width: 90%; */
   position: sticky;
   position: -webkit-sticky; /* Safari */
   list-style-type: none;
@@ -15,7 +14,6 @@
 }
 
 .navbar li {
-  /* float: left; */
   display: inline-block;
   width: 33.333333%;
 }
@@ -28,10 +26,12 @@
   text-decoration: none;
 }
 
-.navbar li a:hover {
-  background-color: #111;
-}
-
 .active {
   background-color: #475ab1;
+}
+
+@media only screen and (min-width: 768px) {
+  .navbar li a:hover {
+    background-color: #111;
+  }
 }

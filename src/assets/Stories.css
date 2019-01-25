@@ -1,0 +1,37 @@
+.stories-list {
+  text-align: left;
+  margin: 25px auto;
+  list-style-type: none;
+  box-shadow: 1px 1px 1px 1px #ccc;
+}
+
+.story {
+  width: 100%;
+  display: table;
+  padding: 10px 20px;
+  box-sizing: border-box;
+  border-bottom: 1px solid #ccc;
+}
+
+.story:hover {
+  background-color: #ccc;
+}
+
+.story a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.story a:hover {
+  text-decoration: underline;
+}
+
+.no-items {
+  margin: 0 auto;
+  padding: 25px;
+  color: rgb(200, 200, 200);
+}
+
+.story span {
+  font-size: 0.8em;
+}
